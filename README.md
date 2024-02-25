@@ -1,4 +1,4 @@
-# DTOLR: Decision Tree for Outlier Labeling and Explanation
+# DTOLR: Decision Tree One Label for outlier explanations
 
 DTOLR (Decision Tree One Label Regressor) is a Python library for explaining outlier detection results using decision trees. It provides a method to interpret the decisions made by an outlier detection model, specifically tailored for anomaly detection tasks.
 
