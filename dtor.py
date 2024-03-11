@@ -13,13 +13,66 @@
 # limitations under the License.
 
 import warnings
+from alibi.explainers.anchors.anchor_tabular import AnchorTabular
+# from anchor import anchor_tabular
 import numpy as np
 import pandas as pd
+import math
 import os
 from joblib import Parallel, delayed
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import DecisionTreeRegressor, export_text
 import time
+import matplotlib
+
+os.umask(0o02)
+matplotlib.use('agg')
+
+
+def extract_path(tree, feature_names, instance):
+    """
+    Extracts the decision path of an instance through a decision tree.
+
+    Args:
+    - tree (DecisionTreeClassifier or DecisionTreeRegressor): The decision tree model.
+    - feature_names (list): List of feature names.
+    - instance (pandas Series): The instance for which the decision path is to be extracted.
+
+    Returns:
+    - path (list): List of strings representing the decision path.
+    """
+    path = []
+    node_indicator = tree.decision_path(pd.DataFrame(instance.to_dict(), index=[0]))
+    node_index = node_indicator.indices[node_indicator.indptr[0]:node_indicator.indptr[1]]
+
+    for node_id in node_index:
+        if tree.tree_.children_left[node_id] == -1:  # Leaf node
+            break
+
+        feature = tree.tree_.feature[node_id]
+        threshold = tree.tree_.threshold[node_id]
+
+        # Round the threshold depending on how distant the observed feature
+        # is from the unrounded threshold.
+        delta = abs(instance[feature] - threshold)
+        order_of_mag = math.floor(math.log(delta, 10))
+        if order_of_mag >= 0:
+            multiplier = 10 ** order_of_mag
+            threshold = round(threshold / multiplier) * multiplier
+        else:
+            multiplier = 10 ** (-order_of_mag)
+            threshold = round(threshold * multiplier) / multiplier
+
+        # Update the threshold for the feature in the decision path
+        if instance[feature] <= threshold:
+            path.append(f"`{feature_names[feature]}` <= {threshold}")
+            node_id = tree.tree_.children_left[node_id]
+        else:
+            path.append(f"`{feature_names[feature]}` > {threshold}")
+            node_id = tree.tree_.children_right[node_id]
+
+    return path
+
 
 class DTOR:
     """
