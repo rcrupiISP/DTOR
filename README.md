@@ -5,6 +5,11 @@
 
 DTOR (Decision Tree Outlier Regressor) is a Python library for explaining outlier detection results using decision trees. It provides a method to interpret the decisions made by an outlier detection model, specifically tailored for anomaly detection tasks.
 
+> ### Authors & contributors:
+> Riccardo Crupi, Daniele Regoli, Alessandro Damiano Sabatino, Immacolata Marano, Massimiliano Brinis, Luca Albertazzi, Andrea Cirillo, Andrea Claudio Cosentini
+
+To know more about this research work, please refer to our paper [ArXiv](https://arxiv.org/abs/2403.10903).
+
 ## Overview
 
 DTOR aims to improve the interpretability of outlier detection models, particularly in scenarios where understanding the reasons behind a data point being flagged as an outlier is crucial. It offers methods to extract decision rules from an ensemble of decision trees trained to distinguish outliers from normal data points.
